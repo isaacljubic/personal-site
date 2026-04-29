@@ -304,17 +304,25 @@ function HeroScene() {
 
     const onResize = () => {
       const W = mount.clientWidth, H = mount.clientHeight;
+      if (W === 0 || H === 0) return; // skip until container has real size
       camera.aspect = W / H;
       camera.updateProjectionMatrix();
       renderer.setSize(W, H);
     };
     window.addEventListener('resize', onResize);
 
+    // ResizeObserver fires the first time the container actually has
+    // dimensions, fixing the "have to manually resize the window" issue
+    // when the scene mounts before the browser finishes initial layout.
+    const ro = new ResizeObserver(onResize);
+    ro.observe(mount);
+
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('blur', onLeave);
       window.removeEventListener('resize', onResize);
+      ro.disconnect();
       mount.removeChild(renderer.domElement);
       planeGeo.dispose();
       lineGeo.dispose();
