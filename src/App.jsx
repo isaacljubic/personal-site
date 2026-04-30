@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import {
   ArrowUpRight, Mail, ChevronDown, Cpu, Watch, Shield, BookOpen,
-  Wrench, Rocket, Send, CheckCircle2, AlertCircle, Code2, Building2, Sparkles, Car
+  Wrench, Rocket, Send, CheckCircle2, AlertCircle, Code2, Network, Sparkles, CandlestickChart
 } from 'lucide-react';
 
 // ============================================================================
@@ -404,7 +404,6 @@ function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   const links = [
-    { href: '#origin', label: 'Origin' },
     { href: '#ventures', label: 'Ventures' },
     { href: '#now', label: 'Today' },
     { href: '#future', label: 'Future' },
@@ -485,8 +484,7 @@ function Hero() {
         </h1>
         <p className="hero-sub">
           Building deeply technical systems at the intersection of <em>cryptography</em>,
-          <em> hardware</em>, and <em>artificial intelligence</em>. Always something
-          new on the bench.
+          <em> hardware</em>, and <em>artificial intelligence</em>. Bridging <em>low-level engineering</em> and applied systems.
         </p>
         <div className="hero-actions">
           <Magnetic strength={0.18}>
@@ -540,15 +538,11 @@ function About() {
           <Reveal delay={100}>
             <p className="about-lede">
               I'm a computer systems engineer working across the stack, from
-              cryptography and embedded hardware up to AI systems. I tend to
-              go deep on a problem, plan out how to solve it properly, and
+              cryptography and embedded hardware to AI systems. I go deep on problems, design solutions properly and
               then ship.
             </p>
             <p className="about-lede">
-              The work has covered open-source crypto networks, mechanical
-              hardware, GTM AI systems, two patents and a thesis on RAG
-              optimisation. The throughline is the engineering, not the
-              category.
+              My work spans three companies, open-source crypto networks, mechanical hardware, AI systems, two patents and a dissertation on RAG optimisation.
             </p>
           </Reveal>
           <Reveal delay={200} className="about-side">
@@ -575,15 +569,16 @@ function About() {
 // ============================================================================
 // ORIGIN STORY — early years timeline
 // ============================================================================
+/*
 function Origin() {
   const items = [
-    { age: '09', t: 'First lines of code', d: 'Started writing code in primary school and never really stopped.' },
-    { age: '12', t: 'Three programming languages', d: 'Working across C++, Python, and Java by grade 7.' },
-    { age: '13', t: 'Racing drones', d: 'Saved up from a part-time job and started building 5" racing quads. Three custom builds across two years.' },
-    { age: '14', t: 'Bought a 3D printer', d: 'Designed and built a 4-motor robot arm and printer upgrades from scratch.' },
-    { age: '14', t: 'Logan Entrepreneurial Innovation Challenge', d: 'Won the challenge. One of several STEM competitions taken on through school.' },
-    { age: '15', t: 'FIRST LEGO League / Internationals invite', d: 'Past regionals → states → flew to Sydney for nationals → invited to internationals in the USA.' },
-    { age: '17', t: 'Cert II in Engineering / built a racecar', d: 'Suicide-5 senior subjects. Swapped Biology for engineering, where we built and raced a car against other schools.' },
+    { age: '09', t: 'Learning to Code', d: 'Started writing code in primary school through Minecraft modding and basic terminal applications.' },
+    { age: '12', t: 'Three Programming Languages', d: 'By Grade 7 I had expanded my knowledge and had a good understanding of the syntax of C++, Python and Java.' },
+    { age: '13', t: 'Racing Drones', d: 'Saved up from a part-time job and started building FPV Racing Quads. 4 Custom Builds over three years. This was my first true introduction to hardware (after arduino)' },
+    { age: '14', t: 'Built a 3D printer', d: 'Saved up again and bought a 3D printer kit which I promptly built. Subsequent proejcts from this was a 4-motor robot arm and upgrades for the printer itself.' },
+    { age: '14', t: '1st @ 2017 Logan Entrepreneurial Innovation Challenge', d: '3 Days of Designing, Building and Presenting a Product. I believe this event was pivotal in forming my current mentality of "Design and Ship with everything you have"' },
+    { age: '15', t: 'Internationals @ 2018 FIRST LEGO League', d: 'Past regionals → states → flew to Sydney for nationals → invited to internationals in the USA. Team did not fly over due to budget constraints.' },
+    { age: '17', t: 'Built a Racecar', d: 'Participated in my schools Formula Student team, where we learn the basics of Engineering Principles, built and raced a car against other schools.' },
   ];
   return (
     <section id="origin" className="section section-alt">
@@ -609,7 +604,7 @@ function Origin() {
       </div>
     </section>
   );
-}
+}*/
 
 // ============================================================================
 // VENTURES
@@ -633,27 +628,17 @@ function Ventures() {
       role: 'Inventor',
       tag: 'Provisional Patent',
       status: 'patent',
-      blurb: 'Filed a provisional patent two months after FrontierVR. A novel optimisation approach for GPU-side ray tracing.',
+      blurb: 'Filed a provisional patent two months after starting FrontierVR. A novel optimisation approach for GPU-side ray tracing, more specifically a software system for square-root approximation. Square-root operations are the main bottleneck when it comes to rendering ray-traced graphics so improving this improved the performance of Ray Tracing engines noticeably.',
       meta: '1st provisional patent',
     },
     {
-      icon: Car,
-      year: '2021 / 2024',
-      name: 'Locost',
-      role: 'Co-Builder',
-      tag: 'Hardware · Automotive',
-      status: 'completed',
-      blurb: 'A modernised Lotus 7-style chassis hand-built in the shed with my dad. Tuned Honda K24, MX5 gearbox, 630kg, no windshield. Engineered to road-legal spec, and out on the road regularly. Possibly the most engaging car to drive, ever.',
-      meta: '630kg · K24 swap',
-    },
-    {
-      icon: Shield,
-      year: '2022 / 2025',
+      icon: Network,
+      year: '2022 / 2024',
       name: 'The Valency Project',
       role: 'Founder · Architect',
       tag: 'Cryptography · Network',
       status: 'archived',
-      blurb: 'A custom cryptocurrency network. Authored a 100+ page whitepaper over 5 months, then shipped Valency-Core: open-source crypto, UI and networking frameworks in C++.',
+      blurb: 'A custom cryptocurrency network. Authored a 100+ page whitepaper over 5 months, then shipped Valency-Core: open-source crypto, UI and networking frameworks in C++. Archived when I switched to the Valency Exchange - which is the for-profit half of the Valency Project.',
       meta: 'Whitepaper · 100+ pages',
       links: [
         { href: 'https://valency.dev/The-Valency-Project.pdf', label: 'Whitepaper' },
@@ -661,14 +646,14 @@ function Ventures() {
       ],
     },
     {
-      icon: Building2,
+      icon: CandlestickChart,
       year: '2023 →',
       name: 'Valency Exchange',
       role: 'Founder · CEO',
       tag: 'Fintech · Open Source',
       status: 'live',
       blurb: 'The world\'s first fully open-source centralised crypto exchange. AUSTRAC registered. Partnered with world-leading liquidity providers. Currently working around the Australian debanking landscape to bring it to market.',
-      meta: 'AUSTRAC registered',
+      meta: 'Crypto Exchange',
       links: [
         { href: 'https://valency.exchange', label: 'Site' },
         { href: 'https://github.com/Valency-Australia', label: 'Github' },
@@ -681,12 +666,22 @@ function Ventures() {
       role: 'Co-Founder',
       tag: 'Hardware · D2C',
       status: 'live',
-      blurb: 'Co-founded with Rorey Stewart. Fully custom mechanical watches built through an in-browser configurator: preview, configure, etch a unique number, and ship. Launching on Kickstarter.',
+      blurb: 'Co-founded with Rorey Stewart. Fully custom mechanical watches built through an in-browser configurator: preview, configure, build, and ship the watch of your dreams. Launching on Kickstarter soon however our website is already up.',
       meta: 'Approaching launch',
       links: [
         { href: 'https://oextime.com', label: 'Site' },
         { href: 'https://www.instagram.com/oextime', label: 'Instagram' },
       ],
+    },
+    {
+      icon: Shield,
+      year: '2025 →',
+      name: 'Valency Crypto Wallet',
+      role: 'Creator',
+      tag: 'Hardware · Crypto Wallet',
+      status: 'in-progress',
+      blurb: 'Built under the Valency brand - this is the Worlds thinnest usb-c device. Currently in prototype phase, this device includes all the features of other Crypto Hardware Wallets + the worlds thinnest USB-C device design, metal frame, bluetooth and a High-Resolution OLED display.',
+      meta: 'Consumer Hardware · Super-Thin Device',
     },
     {
       icon: Rocket,
@@ -695,8 +690,8 @@ function Ventures() {
       role: 'Head of Engineering',
       tag: 'GTM · AI Systems',
       status: 'live',
-      blurb: 'Head of Engineering at North Consulting, a GTM consulting and engineering firm. Shipped 2,000+ campaigns and enriched 1M+ ICP datapoints for clients to date.',
-      meta: '2k campaigns / 1M+ datapoints',
+      blurb: 'Head of Engineering at North Consulting, a B2B revenue consulting and engineering firm. As of updating this site we have shipped over 2,000 campaigns and enriched over 1 million ICP datapoints for clients. We Grow Revenue without growing headcount.',
+      meta: 'AI Sales Systems for Revenue Growth',
       links: [
         { href: 'https://northconsulting.com.au', label: 'Site' },
       ],
@@ -704,12 +699,12 @@ function Ventures() {
     {
       icon: BookOpen,
       year: '2025',
-      name: 'RAG Optimisation Thesis',
+      name: 'RAG Optimisation Dissertation',
       role: 'Author',
       tag: 'Research',
       status: 'published',
-      blurb: 'Final thesis paper for B.Eng (Hons): Optimisation Techniques for Retrieval-Augmented Generation, with comparative benchmarks.',
-      meta: 'Final-year thesis',
+      blurb: 'Final dissertion for B.Eng (Hons): Optimising Retrieval-Augmented Generation (RAG) Workflows for Large Language Models: A look at Accuracy, Efficiency and Reliability in Knowledge-Intensive Applications.',
+      meta: 'Final-year dissertation',
     },
     {
       icon: Sparkles,
@@ -718,7 +713,7 @@ function Ventures() {
       role: 'Inventor',
       tag: 'Provisional Patent',
       status: 'patent',
-      blurb: 'Filed a provisional patent at the start of 2026 covering a novel optimisation system for large language models.',
+      blurb: 'Filed a provisional patent at the start of 2026 covering a novel optimisation system for large language models. The system reduces token usage in High Parameter-Count LLMs significantly.',
       meta: '2nd provisional patent',
     },
   ];
@@ -738,6 +733,7 @@ function Ventures() {
                     <div className={`venture-status venture-status-${v.status}`}>
                       <span className="status-dot" />
                       {v.status === 'live' && 'ACTIVE'}
+                      {v.status === 'in-progress' && 'IN PROGRESS'}
                       {v.status === 'paused' && 'PAUSED'}
                       {v.status === 'archived' && 'ARCHIVED'}
                       {v.status === 'patent' && 'FILED'}
@@ -812,8 +808,8 @@ function Today() {
       id: 'p01',
       priority: 'PRIORITY_01',
       title: 'North Consulting',
-      tagline: 'The day job. GTM and AI engineering.',
-      detail: 'Heads-down through the work week and the occasional weekend. Building, shipping, leading the engineering function.',
+      tagline: 'Building AI-Systems for Revenue Growth. ',
+      detail: 'Heads-down through the work week and the occasional weekend. Designing, building and shipping... I lead the engineering function of the company.',
       status: 'RUNNING',
       cmd: 'exec --priority=high --schedule=weekdays+occasional-weekends',
     },
@@ -821,7 +817,7 @@ function Today() {
       id: 'p02',
       priority: 'PRIORITY_02',
       title: 'OEX Timepieces',
-      tagline: 'Hardware product, approaching launch.',
+      tagline: 'Finalising infrastructure that facilitates the ordering and build of Custom Timepieces',
       detail: 'Always running in parallel. Kickstarter pre-launch is close.',
       status: 'RUNNING',
       cmd: 'exec --priority=high --schedule=continuous',
@@ -831,15 +827,15 @@ function Today() {
       priority: 'PRIORITY_03',
       title: 'Valency Exchange',
       tagline: 'Working through the debanking landscape toward launch.',
-      detail: 'Always running in parallel. Active engineering and ops.',
+      detail: 'Always running in parallel. Active engineering and ops. Currently finishing up the Webapp.',
       status: 'RUNNING',
       cmd: 'exec --priority=high --schedule=continuous',
     },
     {
       id: 'p04',
       priority: 'PRIORITY_04',
-      title: 'Side experiments',
-      tagline: 'Patents, weekend builds, what comes next.',
+      title: '[PAUSED] Side experiments',
+      tagline: 'Weekend builds, patents + whatever comes next. Paused for a while now while I am working on the above companies.',
       detail: 'Reserved cycles for research, prototypes and the next thing on the horizon.',
       status: 'QUEUED',
       cmd: 'exec --priority=low --schedule=spare-cycles',
@@ -916,7 +912,6 @@ function Today() {
                   </div>
                   <div className="queue-row-title">
                     <span className="queue-title-text">{t.title}</span>
-                    {isLead && <span className="queue-cursor" />}
                   </div>
                   <div className={`queue-row-status status-${t.status.toLowerCase()}`}>
                     <span className="queue-status-dot" />
@@ -962,26 +957,26 @@ function Future() {
   const items = [
     {
       icon: Wrench,
-      title: 'Open Industrial Automation Standard',
-      kind: 'Non-Profit / planned',
-      tagline: 'A canonical playbook from raw material to a fully automated production line.',
+      title: 'Open-Source Industrial Automation',
+      kind: 'Non-Profit Organisation',
+      tagline: 'An Open-Source Framework that allows anyone to go from raw material to fully-automated production line.',
       pillars: [
-        { k: 'Software',     v: 'Open-source planning and design tools' },
-        { k: 'Intelligence', v: 'AI consultation built into the workflow' },
-        { k: 'Blueprints',   v: 'Every machine and process documented, free' },
-        { k: 'Outcome',      v: 'Build anything, anywhere, without supply-chain restrictions' },
+        { k: 'Vision',     v: 'Open-Source Machines, planning and design tools to accomodate a more open industrial automation standard.' },
+        { k: 'Scope',     v: 'Hardware and Software. I envision this becoming THE standard in Industrial Automation.' },
+        { k: 'Blueprints',   v: 'Every machine and process documented, free, with tools to assist factory/workshop design.' },
+        { k: 'Outcome',      v: 'Build anything, anywhere, without supply-chain restrictions. The ultimate goal for this would be to have everything up to and beyond an open-source photolithography machine - this would make historically unreliable supply chains much more efficient and decentralise critical manufacturing infrastructure. The reach and economic impact of a non-profit like this would be of proportions rivaling or even beating that of the Linux Foundation.' },
       ],
     },
     {
       icon: Code2,
-      title: 'FrontierVR / relaunched',
-      kind: 'Product / planned',
-      tagline: 'Returning to where it started.',
+      title: 'FrontierVR Relaunch',
+      kind: 'Hardware Product Company',
+      tagline: 'Returning to where it started... just with more time, resources, greater engineering expertise and better component maturity',
       pillars: [
-        { k: 'Vision',  v: 'Genuinely experience real life inside VR' },
-        { k: 'Scope',   v: 'Hardware and software, the full sensory loop' },
-        { k: 'Why Now', v: 'AI and component maturity unlock what wasn\'t feasible in 2020' },
-        { k: 'Stage',   v: 'Concept held in reserve, awaiting the right cycle' },
+        { k: 'Vision',  v: 'Engineer and market a full-body haptic system so finely-tuned that it genuinely feels like you are experiencing real life inside of VR.' },
+        { k: 'Scope',   v: 'Hardware and Firmware. I envisage developers being reluctant to develop experiences for the system so some demos or even full-length video games may have to be developed in-house.' },
+        { k: 'Why in the Future', v: 'The reason FrontierVR was paused in the first place was due to the sheer cost of getting electronics certified. VR quality and component maturity is the second reason. Both of these problems are solved, with the only roadblock being the time commitment.' },
+        { k: 'Outcome',   v: 'The sheer thought of a device that let any human experience a real-life like experience from their living room was science fiction not long ago. It has been a long time since the initial WOW factor of VR, and this system would be that second moment. If the system did what it promises it would become just as necesary as the Smartphone.' },
       ],
     },
   ];
@@ -1664,6 +1659,8 @@ function Styles() {
       .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-mute); }
       .venture-status-live .status-dot { background: #4dd35a; box-shadow: 0 0 8px #4dd35a; animation: pulseDot 2s infinite; }
       .venture-status-live { color: #4dd35a; border-color: rgba(77,211,90,0.4); }
+      .venture-status-in-progress .status-dot { background: #4dd35a; box-shadow: 0 0 8px #4dd35a; animation: pulseDot 2s infinite; }
+      .venture-status-in-progress { color: #4dd35a; border-color: rgba(77,211,90,0.4); }
       .venture-status-paused { color: #f5b342; border-color: rgba(245,179,66,0.4); }
       .venture-status-paused .status-dot { background: #f5b342; }
       .venture-status-archived { color: var(--text-mute); }
@@ -1731,7 +1728,7 @@ function Styles() {
       .queue-meta-val { color: var(--text); }
       .queue-blink {
         color: var(--accent);
-        animation: queueBlink 1.6s ease infinite;
+        animation: queueBlink 6s ease infinite;
       }
       @keyframes queueBlink {
         0%, 60% { opacity: 1; }
@@ -2156,7 +2153,6 @@ export default function App() {
       <main>
         <Hero />
         <About />
-        <Origin />
         <Ventures />
         <Today />
         <Future />
