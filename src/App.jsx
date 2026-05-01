@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 
 // ============================================================================
-// CONFIG — replace these two values before going live
+// CONFIG
 // ============================================================================
 const TURNSTILE_SITEKEY = "0x4AAAAAADFk34QHrSswkgud";
 const WEBHOOK_URL = "https://northconsulting.app.n8n.cloud/webhook/9b8bbc86-ab11-47f1-a310-427f5f59095a";
@@ -484,7 +484,7 @@ function Hero() {
         </h1>
         <p className="hero-sub">
           Building deeply technical systems at the intersection of <em>cryptography</em>,
-          <em> hardware</em>, and <em>artificial intelligence</em>. Bridging <em>low-level engineering</em> and applied systems.
+          <em> hardware</em> and <em>artificial intelligence</em>. Bridging <em>low-level engineering</em> and applied systems.
         </p>
         <div className="hero-actions">
           <Magnetic strength={0.18}>
@@ -566,45 +566,6 @@ function About() {
   );
 }
 
-// ============================================================================
-// ORIGIN STORY — early years timeline
-// ============================================================================
-/*
-function Origin() {
-  const items = [
-    { age: '09', t: 'Learning to Code', d: 'Started writing code in primary school through Minecraft modding and basic terminal applications.' },
-    { age: '12', t: 'Three Programming Languages', d: 'By Grade 7 I had expanded my knowledge and had a good understanding of the syntax of C++, Python and Java.' },
-    { age: '13', t: 'Racing Drones', d: 'Saved up from a part-time job and started building FPV Racing Quads. 4 Custom Builds over three years. This was my first true introduction to hardware (after arduino)' },
-    { age: '14', t: 'Built a 3D printer', d: 'Saved up again and bought a 3D printer kit which I promptly built. Subsequent proejcts from this was a 4-motor robot arm and upgrades for the printer itself.' },
-    { age: '14', t: '1st @ 2017 Logan Entrepreneurial Innovation Challenge', d: '3 Days of Designing, Building and Presenting a Product. I believe this event was pivotal in forming my current mentality of "Design and Ship with everything you have"' },
-    { age: '15', t: 'Internationals @ 2018 FIRST LEGO League', d: 'Past regionals → states → flew to Sydney for nationals → invited to internationals in the USA. Team did not fly over due to budget constraints.' },
-    { age: '17', t: 'Built a Racecar', d: 'Participated in my schools Formula Student team, where we learn the basics of Engineering Principles, built and raced a car against other schools.' },
-  ];
-  return (
-    <section id="origin" className="section section-alt">
-      <div className="container">
-        <SectionHeader index="01" kicker="// origin" title="The early years." />
-        <div className="timeline">
-          <div className="timeline-spine" />
-          {items.map((it, i) => (
-            <Reveal key={i} delay={i * 80}>
-              <div className="timeline-item">
-                <div className="timeline-node">
-                  <span>{it.age}</span>
-                </div>
-                <div className="timeline-card">
-                  <div className="timeline-card-meta">AGE {it.age} / EVT_{String(i + 1).padStart(3, '0')}</div>
-                  <h3>{it.t}</h3>
-                  <p>{it.d}</p>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}*/
 
 // ============================================================================
 // VENTURES
@@ -666,7 +627,7 @@ function Ventures() {
       role: 'Co-Founder',
       tag: 'Hardware · D2C',
       status: 'live',
-      blurb: 'Co-founded with Rorey Stewart. Fully custom mechanical watches built through an in-browser configurator: preview, configure, build, and ship the watch of your dreams. Launching on Kickstarter soon however our website is already up.',
+      blurb: 'Co-founded with Rorey Stewart. Fully custom mechanical watches built through an in-browser configurator: preview, configure, build and ship the watch of your dreams. Launching on Kickstarter soon however our website is already up.',
       meta: 'Approaching launch',
       links: [
         { href: 'https://oextime.com', label: 'Site' },
@@ -721,7 +682,7 @@ function Ventures() {
   return (
     <section id="ventures" className="section">
       <div className="container">
-        <SectionHeader index="02" kicker="// ventures" title="Companies, patents, papers." />
+        <SectionHeader index="01" kicker="// ventures" title="Companies, patents, papers." />
         <div className="ventures-grid">
           {items.map((v, i) => {
             const Icon = v.icon;
@@ -772,6 +733,7 @@ function Ventures() {
   );
 }
 
+
 // ============================================================================
 // TODAY — interactive priority queue (CPU-scheduler-style)
 // ============================================================================
@@ -809,7 +771,7 @@ function Today() {
       priority: 'PRIORITY_01',
       title: 'North Consulting',
       tagline: 'Building AI-Systems for Revenue Growth. ',
-      detail: 'Heads-down through the work week and the occasional weekend. Designing, building and shipping... I lead the engineering function of the company.',
+      detail: 'Busy through the work week and the occasional weekend. Designing, building and shipping... I lead the engineering function of the company.',
       status: 'RUNNING',
       cmd: 'exec --priority=high --schedule=weekdays+occasional-weekends',
     },
@@ -818,7 +780,7 @@ function Today() {
       priority: 'PRIORITY_02',
       title: 'OEX Timepieces',
       tagline: 'Finalising infrastructure that facilitates the ordering and build of Custom Timepieces',
-      detail: 'Always running in parallel. Kickstarter pre-launch is close.',
+      detail: 'Always running in parallel to all my other commitments. Kickstarter pre-launch is closing in.',
       status: 'RUNNING',
       cmd: 'exec --priority=high --schedule=continuous',
     },
@@ -827,7 +789,7 @@ function Today() {
       priority: 'PRIORITY_03',
       title: 'Valency Exchange',
       tagline: 'Working through the debanking landscape toward launch.',
-      detail: 'Always running in parallel. Active engineering and ops. Currently finishing up the Webapp.',
+      detail: 'Always running in parallel. Active engineering and operations. Currently finishing up the Webapp, then will be on to alpha testing.',
       status: 'RUNNING',
       cmd: 'exec --priority=high --schedule=continuous',
     },
@@ -873,7 +835,7 @@ function Today() {
   return (
     <section id="now" className="section section-alt">
       <div className="container">
-        <SectionHeader index="03" kicker="// now" title="The current priority queue." />
+        <SectionHeader index="02" kicker="// now" title="The current priority queue." />
 
         <Reveal>
           <div className="queue-meta">
@@ -950,6 +912,7 @@ function Today() {
   );
 }
 
+
 // ============================================================================
 // FUTURE
 // ============================================================================
@@ -983,7 +946,7 @@ function Future() {
   return (
     <section id="future" className="section">
       <div className="container">
-        <SectionHeader index="04" kicker="// future" title="What I'm building toward." />
+        <SectionHeader index="03" kicker="// future" title="What I'm building toward." />
         <div className="future-grid">
           {items.map((it, i) => {
             const Icon = it.icon;
@@ -1016,6 +979,7 @@ function Future() {
   );
 }
 
+
 // ============================================================================
 // TURNSTILE WIDGET
 // ============================================================================
@@ -1041,6 +1005,7 @@ function Turnstile({ onToken }) {
           widgetIdRef.current = window.turnstile.render(ref.current, {
             sitekey: TURNSTILE_SITEKEY,
             theme: 'dark',
+            appearance: 'interaction-only',
             callback: (token) => onToken(token),
             'error-callback': () => onToken(null),
             'expired-callback': () => onToken(null),
@@ -1083,7 +1048,7 @@ function Contact() {
 
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       setStatus('error');
-      setErrorMsg('Please fill in name, email, and message.');
+      setErrorMsg('Please fill in name, email and message.');
       return;
     }
     if (!token) {
@@ -1123,7 +1088,7 @@ function Contact() {
   return (
     <section id="contact" className="section">
       <div className="container">
-        <SectionHeader index="05" kicker="// contact" title="Get in touch." />
+        <SectionHeader index="04" kicker="// contact" title="Get in touch." />
         <div className="contact-grid">
           <Reveal>
             <div className="contact-side">
@@ -1227,6 +1192,7 @@ function Contact() {
   );
 }
 
+
 // ============================================================================
 // FOOTER
 // ============================================================================
@@ -1253,6 +1219,7 @@ function Footer() {
     </footer>
   );
 }
+
 
 // ============================================================================
 // STYLES
@@ -2064,7 +2031,7 @@ function Styles() {
       .field:focus-within::after { transform: scaleX(1); }
       .field input:disabled, .field textarea:disabled { opacity: 0.5; }
 
-      .turnstile-mount { min-height: 65px; }
+      .turnstile-mount { }
 
       .form-msg {
         display: flex; align-items: center; gap: 10px;
