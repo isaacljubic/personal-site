@@ -69,7 +69,7 @@ function useGitHubStreak(username = 'isaacljubic', minBound = 1000) {
         let count = 0;
         for (let i = days.length - 1; i >= 0; i--) {
           const day = days[i];
-          if (day.date === today) continue;
+          if (day.date >= today) continue;
           if (day.count > 0) count++;
           else break;
         }
