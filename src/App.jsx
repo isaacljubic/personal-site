@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import {
   ArrowUpRight, Mail, ChevronDown, Cpu, Watch, Shield, BookOpen,
-  Wrench, Rocket, Send, CheckCircle2, AlertCircle, Code2, Network, Sparkles, CandlestickChart
+  Wrench, Rocket, Send, CheckCircle2, AlertCircle, Code2, Network, Sparkles, CandlestickChart, Feather
 } from 'lucide-react';
 
 // ============================================================================
@@ -570,7 +570,181 @@ function About() {
 // ============================================================================
 // VENTURES
 // ============================================================================
+// ============================================================================
+// VENTURES GAP FILLER — animated circuit-board pattern
+// ============================================================================
+// The Filler Animated Circuit Board Background
+function VenturesFiller({ colStart }) {
+  const canvasRef = useRef(null);
+  const wrapRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const wrap = wrapRef.current;
+    if (!canvas || !wrap) return;
+
+    const ctx = canvas.getContext('2d');
+    const DARK = '#0b0b0d';
+    const CELL = 13;
+    const GAP = 1;
+    const FIL = CELL - GAP;
+
+    let W = 0, H = 0, raf;
+    let traces = [];
+    let signals = [];
+
+    const buildTraces = () => {
+      traces = [];
+      const cols = Math.ceil(W / CELL) + 2;
+      const rows = Math.ceil(H / CELL) + 2;
+
+      for (let r = 0; r < rows; r++) {
+        let c = 0;
+        while (c < cols - 1) {
+          if (Math.random() < 0.42) {
+            const len = 2 + Math.floor(Math.random() * 8);
+            const ec = Math.min(c + len, cols - 1);
+            traces.push({ type: 'h', r, c, end: ec });
+            c = ec + 1 + Math.floor(Math.random() * 3);
+          } else c++;
+        }
+      }
+
+      for (let c = 0; c < cols; c++) {
+        let r = 0;
+        while (r < rows - 1) {
+          if (Math.random() < 0.32) {
+            const len = 2 + Math.floor(Math.random() * 6);
+            const er = Math.min(r + len, rows - 1);
+            traces.push({ type: 'v', r, c, end: er });
+            r = er + 1 + Math.floor(Math.random() * 4);
+          } else r++;
+        }
+      }
+
+      signals = traces
+        .filter(() => Math.random() < 0.22)
+        .map(trace => ({
+          trace,
+          pos: Math.random(),
+          speed: (0.05 + Math.random() * 0.1) * (Math.random() < 0.5 ? 1 : -1),
+        }));
+    };
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      W = wrap.clientWidth;
+      H = wrap.clientHeight;
+      if (!W || !H) return;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      canvas.style.width = `${W}px`;
+      canvas.style.height = `${H}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildTraces();
+    };
+
+    resize();
+    const t0 = performance.now();
+
+    const draw = () => {
+      raf = requestAnimationFrame(draw);
+      const t = (performance.now() - t0) / 1000;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const cols = Math.ceil(W / CELL) + 2;
+      const rows = Math.ceil(H / CELL) + 2;
+
+      // 1 — dense base grid of dark squares (1px lighter gap shows between)
+      ctx.fillStyle = DARK;
+      for (let r = 0; r <= rows; r++) {
+        for (let c = 0; c <= cols; c++) {
+          ctx.fillRect(c * CELL, r * CELL, FIL, FIL);
+        }
+      }
+
+      // 2 — horizontal + vertical circuit traces bridge the gaps
+      ctx.fillStyle = DARK;
+      for (const tr of traces) {
+        if (tr.type === 'h') {
+          ctx.fillRect(tr.c * CELL, tr.r * CELL, (tr.end - tr.c) * CELL + FIL, FIL);
+        } else {
+          ctx.fillRect(tr.c * CELL, tr.r * CELL, FIL, (tr.end - tr.r) * CELL + FIL);
+        }
+      }
+
+      // 3 — junction nodes (slightly lighter dot at each trace endpoint)
+      ctx.fillStyle = '#141418';
+      for (const tr of traces) {
+        const dot = (x, y) => {
+          ctx.beginPath();
+          ctx.arc(x, y, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        };
+        const hx = FIL / 2;
+        if (tr.type === 'h') {
+          dot(tr.c * CELL + hx, tr.r * CELL + hx);
+          dot(tr.end * CELL + hx, tr.r * CELL + hx);
+        } else {
+          dot(tr.c * CELL + hx, tr.r * CELL + hx);
+          dot(tr.c * CELL + hx, tr.end * CELL + hx);
+        }
+      }
+
+      // 4 — animated signal blips travelling along traces
+      for (const sig of signals) {
+        sig.pos += sig.speed / 60;
+        if (sig.pos > 1) sig.pos -= 1;
+        if (sig.pos < 0) sig.pos += 1;
+        const tr = sig.trace;
+        let sx, sy;
+        if (tr.type === 'h') {
+          sx = tr.c * CELL + sig.pos * ((tr.end - tr.c) * CELL);
+          sy = tr.r * CELL + FIL / 2;
+        } else {
+          sx = tr.c * CELL + FIL / 2;
+          sy = tr.r * CELL + sig.pos * ((tr.end - tr.r) * CELL);
+        }
+        const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, 6);
+        g.addColorStop(0, 'rgba(36,36,44,0.95)');
+        g.addColorStop(1, 'rgba(11,11,13,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 5 — very slow diagonal shimmer sweep (dark-on-dark, barely visible)
+      const sweep = (t * 0.022) % 1;
+      const ox = sweep * (W + H);
+      const sg = ctx.createLinearGradient(ox - H * 0.18, 0, ox + H * 0.18, H);
+      sg.addColorStop(0, 'rgba(24,24,30,0)');
+      sg.addColorStop(0.5, 'rgba(24,24,30,0.08)');
+      sg.addColorStop(1, 'rgba(24,24,30,0)');
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, 0, W, H);
+    };
+
+    draw();
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(wrap);
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
+  }, []);
+
+  return (
+    <div data-filler="true" ref={wrapRef} className="ventures-filler" style={{ gridColumn: `${colStart} / -1` }}>
+      <canvas ref={canvasRef} className="ventures-filler-canvas" />
+    </div>
+  );
+}
+
 function Ventures() {
+  const gridRef = useRef(null);
+  const [showFiller, setShowFiller] = useState(false);
+  const [colCount, setColCount] = useState(3);
+
   const items = [
     {
       icon: Cpu,
@@ -635,6 +809,19 @@ function Ventures() {
       ],
     },
     {
+      icon: Feather,
+      year: '2025',
+      name: 'HolyAI',
+      role: 'Creator',
+      tag: 'AI Chatbot · One-Month Project',
+      status: 'live',
+      blurb: 'Lets you have meaningful conversations with AI Jesus, Pope Francis, God and a Pastor. The backend + frontend was built from scratch using FastAPI and React. The model is open-source and fine-tuned on religious information. Personas are done through prompt injection. Full stripe implementation with no-account, free, and paid tiers. It is a full platform with conversation tracking, settings and account management.',
+      meta: 'Religious AI · Side Project',
+      links: [
+        { href: 'https://holyai.app', label: 'Try it out' },
+      ]
+    },
+    {
       icon: Shield,
       year: '2025 →',
       name: 'Valency Crypto Wallet',
@@ -679,11 +866,29 @@ function Ventures() {
     },
   ];
 
+  useEffect(() => {
+  const grid = gridRef.current;
+  if (!grid) return;
+  const check = () => {
+    const colStr = getComputedStyle(grid).gridTemplateColumns;
+    const count = colStr === 'none' ? 1
+      : colStr.trim().split(/\s+/).filter(Boolean).length;
+    setColCount(count);
+    setShowFiller(items.length % count !== 0);
+  };
+  check();
+  const ro = new ResizeObserver(check);
+  ro.observe(grid);
+  return () => ro.disconnect();
+}, []);
+
+const fillerColStart = (items.length % colCount) + 1;
+
   return (
     <section id="ventures" className="section">
       <div className="container">
         <SectionHeader index="01" kicker="// ventures" title="Companies, patents, papers." />
-        <div className="ventures-grid">
+        <div className="ventures-grid" ref={gridRef}>
           {items.map((v, i) => {
             const Icon = v.icon;
             return (
@@ -727,6 +932,7 @@ function Ventures() {
               </Reveal>
             );
           })}
+          {showFiller && <VenturesFiller colStart={fillerColStart} />}
         </div>
       </div>
     </section>
@@ -1574,6 +1780,19 @@ function Styles() {
         .timeline-spine { left: 19px; }
         .timeline-node { left: -56px; width: 40px; height: 40px; font-size: 11px; }
       }
+
+      /* ============ VENTURES FILLER ============ */
+.ventures-filler {
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+  min-height: 440px;
+}
+.ventures-filler-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
 
       /* ============ VENTURES ============ */
       .ventures-grid {
