@@ -585,15 +585,24 @@ function VenturesFiller({ colStart }) {
 
     const ctx = canvas.getContext('2d');
     const DARK = '#0b0b0d';
-    const CELL = 13;
-    const GAP = 1;
-    const FIL = CELL - GAP;
+    const CELL = 14;
+    const FIL = CELL - 1; // 1px gap shows lighter bg through
 
     let W = 0, H = 0, raf;
     let traces = [];
-    let signals = [];
+    let junctions = []; // junctions[i] = [{pos, otherIdx, otherPos}] sorted by pos
+    let racers = [];
 
-    const buildTraces = () => {
+    const trLen = (tr) => tr.type === 'h' ? tr.end - tr.c : tr.end - tr.r;
+
+    const posToXY = (tr, pos) => {
+      const len = trLen(tr);
+      const cx = FIL / 2;
+      if (tr.type === 'h') return { x: tr.c * CELL + pos * len * CELL + cx, y: tr.r * CELL + cx };
+      return { x: tr.c * CELL + cx, y: tr.r * CELL + pos * len * CELL + cx };
+    };
+
+    const build = () => {
       traces = [];
       const cols = Math.ceil(W / CELL) + 2;
       const rows = Math.ceil(H / CELL) + 2;
@@ -601,140 +610,195 @@ function VenturesFiller({ colStart }) {
       for (let r = 0; r < rows; r++) {
         let c = 0;
         while (c < cols - 1) {
-          if (Math.random() < 0.42) {
-            const len = 2 + Math.floor(Math.random() * 8);
-            const ec = Math.min(c + len, cols - 1);
-            traces.push({ type: 'h', r, c, end: ec });
-            c = ec + 1 + Math.floor(Math.random() * 3);
+          if (Math.random() < 0.48) {
+            const ec = Math.min(c + 3 + Math.floor(Math.random() * 9), cols - 1);
+            if (ec > c) traces.push({ type: 'h', r, c, end: ec });
+            c = ec + 1 + Math.floor(Math.random() * 2);
           } else c++;
         }
       }
-
       for (let c = 0; c < cols; c++) {
         let r = 0;
         while (r < rows - 1) {
-          if (Math.random() < 0.32) {
-            const len = 2 + Math.floor(Math.random() * 6);
-            const er = Math.min(r + len, rows - 1);
-            traces.push({ type: 'v', r, c, end: er });
-            r = er + 1 + Math.floor(Math.random() * 4);
+          if (Math.random() < 0.4) {
+            const er = Math.min(r + 2 + Math.floor(Math.random() * 7), rows - 1);
+            if (er > r) traces.push({ type: 'v', r, c, end: er });
+            r = er + 1 + Math.floor(Math.random() * 3);
           } else r++;
         }
       }
 
-      signals = traces
-        .filter(() => Math.random() < 0.22)
-        .map(trace => ({
-          trace,
-          pos: Math.random(),
-          speed: (0.05 + Math.random() * 0.1) * (Math.random() < 0.5 ? 1 : -1),
-        }));
+      // Pre-compute H×V intersections
+      junctions = traces.map(() => []);
+      for (let i = 0; i < traces.length; i++) {
+        for (let j = i + 1; j < traces.length; j++) {
+          const a = traces[i], b = traces[j];
+          if (a.type === b.type) continue;
+          const h = a.type === 'h' ? a : b, v = a.type === 'v' ? a : b;
+          const hi = a.type === 'h' ? i : j, vi = a.type === 'v' ? i : j;
+          const hl = trLen(h), vl = trLen(v);
+          if (!hl || !vl) continue;
+          if (v.c >= h.c && v.c <= h.end && h.r >= v.r && h.r <= v.end) {
+            const ph = (v.c - h.c) / hl;
+            const pv = (h.r - v.r) / vl;
+            junctions[hi].push({ pos: ph, otherIdx: vi, otherPos: pv });
+            junctions[vi].push({ pos: pv, otherIdx: hi, otherPos: ph });
+          }
+        }
+      }
+      junctions.forEach(j => j.sort((a, b) => a.pos - b.pos));
+
+      // Spawn racers preferring connected traces
+      racers = [];
+      const connected = traces.map((_, i) => i).filter(i => junctions[i].length > 0);
+      const pool = connected.length > 0 ? connected : traces.map((_, i) => i);
+      const n = Math.max(5, Math.floor((W * H) / 18000));
+      for (let i = 0; i < n; i++) {
+        if (!pool.length) break;
+        const ti = pool[Math.floor(Math.random() * pool.length)];
+        racers.push({
+          ti,
+          pos: 0.1 + Math.random() * 0.8,
+          dir: Math.random() < 0.5 ? 1 : -1,
+          speed: 2 + Math.random() * 3,       // cells/sec
+          tail: [],
+          tailLen: 12 + Math.floor(Math.random() * 20),
+          turnOdds: 0.2 + Math.random() * 0.4, // chance to take each junction
+        });
+      }
     };
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio, 2);
-      W = wrap.clientWidth;
-      H = wrap.clientHeight;
+      W = wrap.clientWidth; H = wrap.clientHeight;
       if (!W || !H) return;
-      canvas.width = Math.round(W * dpr);
-      canvas.height = Math.round(H * dpr);
-      canvas.style.width = `${W}px`;
-      canvas.style.height = `${H}px`;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      canvas.style.width = `${W}px`; canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildTraces();
+      build();
     };
 
     resize();
-    const t0 = performance.now();
+    let last = performance.now();
 
-    const draw = () => {
+    const draw = (now) => {
       raf = requestAnimationFrame(draw);
-      const t = (performance.now() - t0) / 1000;
-
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
       ctx.clearRect(0, 0, W, H);
 
       const cols = Math.ceil(W / CELL) + 2;
       const rows = Math.ceil(H / CELL) + 2;
 
-      // 1 — dense base grid of dark squares (1px lighter gap shows between)
+      // Grid tiles (dark squares, 1px lighter gap shows through)
       ctx.fillStyle = DARK;
-      for (let r = 0; r <= rows; r++) {
-        for (let c = 0; c <= cols; c++) {
+      for (let r = 0; r <= rows; r++)
+        for (let c = 0; c <= cols; c++)
           ctx.fillRect(c * CELL, r * CELL, FIL, FIL);
+
+      // Circuit traces
+      for (const tr of traces) {
+        ctx.fillStyle = DARK;
+        if (tr.type === 'h') ctx.fillRect(tr.c * CELL, tr.r * CELL, (tr.end - tr.c) * CELL + FIL, FIL);
+        else ctx.fillRect(tr.c * CELL, tr.r * CELL, FIL, (tr.end - tr.r) * CELL + FIL);
+      }
+
+      // Junction nodes
+      ctx.fillStyle = '#161620';
+      for (let i = 0; i < traces.length; i++) {
+        for (const jn of junctions[i]) {
+          if (jn.otherIdx > i) {
+            const pt = posToXY(traces[i], jn.pos);
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, 2.2, 0, Math.PI * 2); ctx.fill();
+          }
         }
       }
 
-      // 2 — horizontal + vertical circuit traces bridge the gaps
-      ctx.fillStyle = DARK;
+      // Endpoint pads
+      ctx.fillStyle = '#131318';
       for (const tr of traces) {
+        const cx = FIL / 2;
+        const dot = (x, y) => { ctx.beginPath(); ctx.arc(x, y, 1.8, 0, Math.PI * 2); ctx.fill(); };
         if (tr.type === 'h') {
-          ctx.fillRect(tr.c * CELL, tr.r * CELL, (tr.end - tr.c) * CELL + FIL, FIL);
+          dot(tr.c * CELL + cx, tr.r * CELL + cx);
+          dot(tr.end * CELL + cx, tr.r * CELL + cx);
         } else {
-          ctx.fillRect(tr.c * CELL, tr.r * CELL, FIL, (tr.end - tr.r) * CELL + FIL);
+          dot(tr.c * CELL + cx, tr.r * CELL + cx);
+          dot(tr.c * CELL + cx, tr.end * CELL + cx);
         }
       }
 
-      // 3 — junction nodes (slightly lighter dot at each trace endpoint)
-      ctx.fillStyle = '#141418';
-      for (const tr of traces) {
-        const dot = (x, y) => {
+      // Racers — navigate junctions, clear tail on turn
+      for (const r of racers) {
+        const tr = traces[r.ti];
+        if (!tr) continue;
+        const len = trLen(tr);
+        if (!len) continue;
+
+        const prev = r.pos;
+        r.pos += r.dir * r.speed * dt / len;
+
+        // Check every junction this racer's trace has
+        const jns = junctions[r.ti];
+        let turned = false;
+        for (const jn of jns) {
+          const crossed = r.dir > 0
+            ? prev < jn.pos && r.pos >= jn.pos
+            : prev > jn.pos && r.pos <= jn.pos;
+          if (crossed && Math.random() < r.turnOdds) {
+            r.tail = [];           // flush tail — no visual jump across traces
+            r.ti = jn.otherIdx;
+            r.pos = jn.otherPos;
+            r.dir = Math.random() < 0.5 ? 1 : -1;
+            turned = true;
+            break;
+          }
+        }
+
+        // Bounce at dead ends
+        if (!turned) {
+          if (r.pos >= 1) { r.pos = 0.98; r.dir = -1; }
+          if (r.pos <= 0) { r.pos = 0.02; r.dir = 1; }
+        }
+
+        const pt = posToXY(traces[r.ti], r.pos);
+        r.tail.push({ x: pt.x, y: pt.y });
+        if (r.tail.length > r.tailLen) r.tail.shift();
+        if (r.tail.length < 2) continue;
+
+        // Draw tail with fading opacity — purely dark-palette
+        for (let i = 1; i < r.tail.length; i++) {
+          const alpha = (i / r.tail.length) * 0.88;
+          ctx.strokeStyle = `rgba(26, 26, 36, ${alpha})`;
+          ctx.lineWidth = 1.5;
+          ctx.lineCap = 'round';
           ctx.beginPath();
-          ctx.arc(x, y, 1.8, 0, Math.PI * 2);
-          ctx.fill();
-        };
-        const hx = FIL / 2;
-        if (tr.type === 'h') {
-          dot(tr.c * CELL + hx, tr.r * CELL + hx);
-          dot(tr.end * CELL + hx, tr.r * CELL + hx);
-        } else {
-          dot(tr.c * CELL + hx, tr.r * CELL + hx);
-          dot(tr.c * CELL + hx, tr.end * CELL + hx);
+          ctx.moveTo(r.tail[i - 1].x, r.tail[i - 1].y);
+          ctx.lineTo(r.tail[i].x, r.tail[i].y);
+          ctx.stroke();
         }
-      }
 
-      // 4 — animated signal blips travelling along traces
-      for (const sig of signals) {
-        sig.pos += sig.speed / 60;
-        if (sig.pos > 1) sig.pos -= 1;
-        if (sig.pos < 0) sig.pos += 1;
-        const tr = sig.trace;
-        let sx, sy;
-        if (tr.type === 'h') {
-          sx = tr.c * CELL + sig.pos * ((tr.end - tr.c) * CELL);
-          sy = tr.r * CELL + FIL / 2;
-        } else {
-          sx = tr.c * CELL + FIL / 2;
-          sy = tr.r * CELL + sig.pos * ((tr.end - tr.r) * CELL);
-        }
-        const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, 6);
-        g.addColorStop(0, 'rgba(36,36,44,0.95)');
-        g.addColorStop(1, 'rgba(11,11,13,0)');
-        ctx.fillStyle = g;
+        // Head
+        ctx.fillStyle = '#222230';
         ctx.beginPath();
-        ctx.arc(sx, sy, 6, 0, Math.PI * 2);
+        ctx.arc(pt.x, pt.y, 2.2, 0, Math.PI * 2);
         ctx.fill();
       }
-
-      // 5 — very slow diagonal shimmer sweep (dark-on-dark, barely visible)
-      const sweep = (t * 0.022) % 1;
-      const ox = sweep * (W + H);
-      const sg = ctx.createLinearGradient(ox - H * 0.18, 0, ox + H * 0.18, H);
-      sg.addColorStop(0, 'rgba(24,24,30,0)');
-      sg.addColorStop(0.5, 'rgba(24,24,30,0.08)');
-      sg.addColorStop(1, 'rgba(24,24,30,0)');
-      ctx.fillStyle = sg;
-      ctx.fillRect(0, 0, W, H);
     };
 
-    draw();
-
+    requestAnimationFrame(draw);
     const ro = new ResizeObserver(resize);
     ro.observe(wrap);
     return () => { cancelAnimationFrame(raf); ro.disconnect(); };
   }, []);
 
   return (
-    <div data-filler="true" ref={wrapRef} className="ventures-filler" style={{ gridColumn: `${colStart} / -1` }}>
+    <div
+      data-filler="true"
+      ref={wrapRef}
+      className="ventures-filler"
+      style={{ gridColumn: `${colStart} / -1` }}
+    >
       <canvas ref={canvasRef} className="ventures-filler-canvas" />
     </div>
   );
@@ -1002,7 +1066,7 @@ function Today() {
     {
       id: 'p04',
       priority: 'PRIORITY_04',
-      title: '[PAUSED] Side experiments',
+      title: '[PAUSED] Side Projects',
       tagline: 'Weekend builds, patents + whatever comes next. Paused for a while now while I am working on the above companies.',
       detail: 'Reserved cycles for research, prototypes and the next thing on the horizon.',
       status: 'QUEUED',
@@ -1140,7 +1204,7 @@ function Future() {
       icon: Code2,
       title: 'FrontierVR Relaunch',
       kind: 'Hardware Product Company',
-      tagline: 'Returning to where it started... just with more time, resources, greater engineering expertise and better component maturity',
+      tagline: 'Returning to where it started... just with more time, resources, greater engineering expertise and better component maturity.',
       pillars: [
         { k: 'Vision',  v: 'Engineer and market a full-body haptic system so finely-tuned that it genuinely feels like you are experiencing real life inside of VR.' },
         { k: 'Scope',   v: 'Hardware and Firmware. I envisage developers being reluctant to develop experiences for the system so some demos or even full-length video games may have to be developed in-house.' },
@@ -1407,7 +1471,8 @@ function Footer() {
     <footer className="footer">
       <div className="container footer-inner">
         <div>
-          <div className="footer-name">ISAAC LJUBIC</div>
+          <div className="footer-name">Isaac Ljubic</div>
+
           <div className="footer-meta">© {new Date().getFullYear()} · Brisbane, Australia</div>
         </div>
         <div className="footer-links">
