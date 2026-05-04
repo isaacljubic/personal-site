@@ -1308,6 +1308,9 @@ function Contact() {
   const [status, setStatus] = useState('idle'); // idle | sending | success | error
   const [errorMsg, setErrorMsg] = useState('');
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^[+]?[\d\s\-().]{5,20}$/;
+
   const handleToken = useCallback((t) => setToken(t), []);
 
   const update = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }));
@@ -1319,6 +1322,16 @@ function Contact() {
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       setStatus('error');
       setErrorMsg('Please fill in name, email and message.');
+      return;
+    }
+    if (!emailRegex.test(form.email)) {
+      setStatus('error');
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+    if (form.phone.trim() && !phoneRegex.test(form.phone)) {
+      setStatus('error');
+      setErrorMsg('Please enter a valid phone number (or no phone number - it is not a mandatory field)');
       return;
     }
     if (!token) {
