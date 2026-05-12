@@ -454,7 +454,7 @@ function Hero() {
       <div className="hero-meta hero-meta-tl">
         <div className="meta-row">
           <span className="meta-dot" />
-          <span>SYS_OK</span>
+          <span>SYSTEM_ONLINE</span>
         </div>
         <div className="meta-row meta-faint">{time}</div>
       </div>
