@@ -460,8 +460,8 @@ function Hero() {
       </div>
 
       <div className="hero-meta hero-meta-tr">
-        <div className="meta-row">LAT 27.4698°S / LNG 153.0251°E</div>
-        <div className="meta-row meta-faint">BRISBANE / AUSTRALIA</div>
+        <div className="meta-row">BRISBANE / AUSTRALIA</div>
+        <div className="meta-row meta-faint">LAT 27.4698°S / LNG 153.0251°E</div>
       </div>
 
       <div className="hero-meta hero-meta-bl">
