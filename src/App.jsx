@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import {
   ArrowUpRight, Mail, ChevronDown, Cpu, Watch, Shield, BookOpen,
-  Wrench, Rocket, Send, CheckCircle2, AlertCircle, Code2, Network, Sparkles, CandlestickChart, Feather
+  Wrench, Rocket, Send, CheckCircle2, AlertCircle, Code2, Network, Sparkles, CandlestickChart, Feather, Calendar
 } from 'lucide-react';
 
 // ============================================================================
@@ -928,6 +928,19 @@ function Ventures() {
       blurb: 'Filed a provisional patent at the start of 2026 covering a novel optimisation system for large language models. The system reduces token usage in High Parameter-Count LLMs significantly.',
       meta: '2nd provisional patent',
     },
+    {
+      icon: Calendar,
+      year: '2026',
+      name: 'Horizon Todo Tracker',
+      role: 'Developer',
+      tag: 'Tiny Side Project',
+      status: 'live',
+      blurb: 'A tiny python-only todo tracker application built in less than 1 hour.  I have little intention to continuously update this app as it serves my needs reasonably well as-is. Features include calendar tracking, priority, streak gamification and weekly reporting.',
+      meta: 'Tiny Open-Source Side-Project',
+      links: [
+        { href: 'https://github.com/isaacljubic/Horizon', label: 'Github' },
+      ],
+    }
   ];
 
   useEffect(() => {
