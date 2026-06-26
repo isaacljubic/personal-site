@@ -1887,13 +1887,19 @@ function Styles() {
 
       /* ============ VENTURES ============ */
       .ventures-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        grid-auto-rows: 1fr;
-        gap: 1px;
-        background: var(--border);
-        border: 1px solid var(--border);
-      }
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+  grid-auto-rows: 1fr;
+  gap: 0;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+.ventures-grid > .reveal,
+.ventures-grid > [data-filler] {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
       .ventures-grid > .reveal { display: flex; flex-direction: column; }
       .ventures-grid > .reveal > .venture-card { flex: 1; width: 100%; }
       .venture-card {
@@ -2180,7 +2186,7 @@ function Styles() {
 
       /* ============ FUTURE ============ */
       .future-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
         grid-auto-rows: 1fr;
         gap: 24px;
       }
