@@ -1891,14 +1891,20 @@ function Styles() {
   grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
   grid-auto-rows: 1fr;
   gap: 0;
-  background: var(--border);
-  border-top: 1px solid var(--border);
-  border-left: 1px solid var(--border);
+  border: 1px solid var(--border);
 }
-.ventures-grid > .reveal,
+
+/* Each cell paints a hairline on all four inner edges. Neighbouring cells
+   both paint the shared edge, so every divider is reinforced from both
+   sides — at least one full device pixel is always drawn, even when a 1fr
+   column lands on a fractional pixel. */
+.ventures-grid > .reveal > .venture-card,
 .ventures-grid > [data-filler] {
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  box-shadow:
+    inset  1px  0    0 0 var(--border),
+    inset -1px  0    0 0 var(--border),
+    inset  0    1px  0 0 var(--border),
+    inset  0   -1px  0 0 var(--border);
 }
       .ventures-grid > .reveal { display: flex; flex-direction: column; }
       .ventures-grid > .reveal > .venture-card { flex: 1; width: 100%; }
