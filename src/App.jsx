@@ -946,16 +946,43 @@ function Ventures() {
   useEffect(() => {
   const grid = gridRef.current;
   if (!grid) return;
-  const check = () => {
-    const colStr = getComputedStyle(grid).gridTemplateColumns;
-    const count = colStr === 'none' ? 1
-      : colStr.trim().split(/\s+/).filter(Boolean).length;
+
+  const MIN = 340;   // must match the minmax() minimum in the CSS
+  const GAP = 1;     // must match the grid gap in the CSS
+  let lastW = -1;
+
+  const snap = (force = false) => {
+    const W = grid.clientWidth;
+    if (!W) return;
+    if (!force && W === lastW) return;   // ignore the resize we trigger ourselves
+    lastW = W;
+
+    // --- columns: whole-pixel widths that exactly fill the row ---
+    const minCol = Math.min(MIN, W);
+    const count = Math.max(1, Math.floor((W + GAP) / (minCol + GAP)));
+    const innerW = W - (count - 1) * GAP;
+    const baseW = Math.floor(innerW / count);
+    const extraW = innerW - baseW * count;
+    grid.style.gridTemplateColumns = Array.from({ length: count }, (_, i) =>
+      `${baseW + (i < extraW ? 1 : 0)}px`).join(' ');
+
     setColCount(count);
     setShowFiller(items.length % count !== 0);
+
+    // --- rows: reflow at the new column width, then round each row up to a
+    //     whole pixel so the horizontal dividers also land on whole pixels ---
+    grid.style.gridTemplateRows = '';                       // recompute natural heights
+    const rowStr = getComputedStyle(grid).gridTemplateRows;  // forces layout, reads px heights
+    if (rowStr && rowStr !== 'none') {
+      grid.style.gridTemplateRows = rowStr.trim().split(/\s+/)
+        .map(v => `${Math.ceil(parseFloat(v))}px`).join(' ');
+    }
   };
-  check();
-  const ro = new ResizeObserver(check);
+
+  snap(true);
+  const ro = new ResizeObserver(() => snap());
   ro.observe(grid);
+  if (document.fonts?.ready) document.fonts.ready.then(() => snap(true)); // re-snap after fonts load
   return () => ro.disconnect();
 }, []);
 
@@ -1888,23 +1915,11 @@ function Styles() {
       /* ============ VENTURES ============ */
       .ventures-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); /* fallback before JS runs */
   grid-auto-rows: 1fr;
-  gap: 0;
+  gap: 1px;
+  background: var(--border);
   border: 1px solid var(--border);
-}
-
-/* Each cell paints a hairline on all four inner edges. Neighbouring cells
-   both paint the shared edge, so every divider is reinforced from both
-   sides — at least one full device pixel is always drawn, even when a 1fr
-   column lands on a fractional pixel. */
-.ventures-grid > .reveal > .venture-card,
-.ventures-grid > [data-filler] {
-  box-shadow:
-    inset  1px  0    0 0 var(--border),
-    inset -1px  0    0 0 var(--border),
-    inset  0    1px  0 0 var(--border),
-    inset  0   -1px  0 0 var(--border);
 }
       .ventures-grid > .reveal { display: flex; flex-direction: column; }
       .ventures-grid > .reveal > .venture-card { flex: 1; width: 100%; }
